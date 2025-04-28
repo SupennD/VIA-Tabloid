@@ -1,0 +1,29 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Apply Kubernetes Manifests
+        run: |
+          kubectl apply -f VIA-Tabloid-Backend/db-deployment.yaml
+          kubectl apply -f VIA-Tabloid-Backend/db-service.yaml
+          kubectl apply -f VIA-Tabloid-Backend/backend-deployment.yaml
+          kubectl apply -f VIA-Tabloid-Backend/backend-service.yaml
+          kubectl apply -f VIA-Tabloid-Frontend/frontend-deployment.yaml
+          kubectl apply -f VIA-Tabloid-Frontend/frontend-service.yaml

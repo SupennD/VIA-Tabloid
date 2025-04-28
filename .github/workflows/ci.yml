@@ -1,0 +1,41 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Frontend Dependencies
+        working-directory: VIA-Tabloid-Frontend
+        run: npm install
+
+      - name: Run Frontend Tests
+        working-directory: VIA-Tabloid-Frontend
+        run: npm run test
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Build Backend
+        working-directory: VIA-Tabloid-Backend
+        run: ./mvnw clean package
