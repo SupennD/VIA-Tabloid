@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: "postgres:14.1-alpine"
+    restart: always
+    container_name: "doc-pgsql-container"
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./VIA-Tabloid-Backend
+    image: 'devops-demo:latest'
+    container_name: 'devops-demo-container'
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/doc-db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./VIA-Tabloid-Frontend
+    container_name: 'devops-frontend-container'
+    ports:
+      - "5173:5173"
+    command: "npm run dev -- --host"
+    depends_on:
+      - backend
+    environment:
+      - VITE_BACKEND_URL=http://localhost:8080
+    networks:
+      - app-network
+
+volumes:
+  db:
+
+networks:
+  app-network:
+    driver: bridge
