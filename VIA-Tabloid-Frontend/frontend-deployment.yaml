@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: devops-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5173
+          command: ["npm", "run", "dev"]
+          args: ["--", "--host", "0.0.0.0"]
